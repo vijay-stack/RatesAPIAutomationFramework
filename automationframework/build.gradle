@@ -1,0 +1,106 @@
+buildscript {
+	dependencies {
+		classpath "io.qameta.allure:allure-gradle:2.5"
+	}
+}
+plugins {
+	id 'org.springframework.boot' version '2.2.4.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id 'java'
+}
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'io.qameta.allure'
+
+ext {
+	cucumberVersion = '4.8.0'
+	allureVersion = '2.7.0'
+	springVersion = '5.2.0.RELEASE'
+}
+allure {
+	version = "${allureVersion}"
+	autoconfigure = true
+	aspectjweaver = true
+	aspectjVersion = '1.8.13'
+	downloadLink = 'https://dl.bintray.com/qameta/generic/io/qameta/allure/allure/2.7.0/allure-2.7.0.zip'
+}
+group = 'com.ratesAPI'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	cucumberRuntime {
+		extendsFrom testRuntime
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+bootJar { enabled = false }
+task regression(dependsOn: testClasses) {
+	doLast {
+		javaexec {
+//			jvmArgs "-javaagent:${configurations.agent.singleFile}"
+			main = "io.cucumber.core.cli.Main"
+			classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+//			classpath = configurations.testRuntimeClasspath + sourceSets.main.output + sourceSets.test.output
+			systemProperty "allure.results.directory", "build/allure-results"
+			args = ['--plugin', 'io.qameta.allure.cucumber4jvm.AllureCucumber4Jvm', '--glue', 'classpath:com.cucumber.stepdef', 'src/test/resources'
+					, '--tags', '@Regression and not @manual']
+		}
+	}
+	finalizedBy 'allureReport'
+}
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter')
+//	implementation 'org.springframework.boot:spring-boot-starter'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+/*	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}*/
+	compile "io.qameta.allure:allure-testng:2.12.0"
+	compile "io.qameta.allure:allure-cucumber4-jvm:2.13.0"
+
+	compile "io.cucumber:cucumber-java8:${cucumberVersion}"
+	compile "io.cucumber:cucumber-spring:${cucumberVersion}"
+	compile "io.cucumber:cucumber-core:${cucumberVersion}"
+	compile "io.cucumber:cucumber-testng:${cucumberVersion}"
+	testCompile "io.cucumber:cucumber-java:${cucumberVersion}"
+
+	compile "org.testng:testng:6.14.3"
+	compile "org.hamcrest:hamcrest-junit:2.0.0.0"
+
+	compile "org.springframework:spring-web:${springVersion}"
+	compile "org.springframework:spring-context:${springVersion}"
+	compile "org.springframework:spring-beans:${springVersion}"
+	compile "org.springframework:spring-test:${springVersion}"
+	compile "org.springframework:spring-tx:${springVersion}"
+	compile "org.springframework.boot:spring-boot-test:2.2.4.RELEASE"
+	compile "org.springframework.boot:spring-boot-starter-data-mongodb:2.0.3.RELEASE"
+
+//	compile group: 'javax.servlet', name: 'servlet-api', version: '2.5'
+//	compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+
+	compile ('org.apache.commons:commons-lang3:3.8.1')
+	compile 'org.apache.httpcomponents:httpclient:4.3.4'
+	compile group: 'org.assertj', name: 'assertj-core-java8', version: '1.0.0m1'
+
+	compile "org.mongodb:mongo-java-driver:3.6.4"
+	compile 'javax.inject:javax.inject:1'
+
+	compile 'io.github.bonigarcia:webdrivermanager:2.2.4'
+	compile 'org.seleniumhq.selenium:selenium-java:2.41.0'
+    implementation 'android.arch.work:work-runtime:1.0.1'
+}
+
+test {
+	useJUnitPlatform()
+}

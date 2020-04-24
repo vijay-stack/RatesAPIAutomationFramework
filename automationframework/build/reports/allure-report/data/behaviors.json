@@ -1,0 +1,25 @@
+{
+  "uid" : "b1a8273437954620fa374b796ffaacdd",
+  "name" : "behaviors",
+  "children" : [ {
+    "name" : "Sample rest api test",
+    "children" : [ {
+      "name" : "client makes call to GET /users",
+      "children" : [ {
+        "name" : "client makes call to GET /users",
+        "uid" : "4275e150521872b",
+        "parentUid" : "7cef57925d5c253098f505183608a59d",
+        "status" : "passed",
+        "time" : {
+          "start" : 1582711387652,
+          "stop" : 1582711388455,
+          "duration" : 803
+        },
+        "flaky" : false,
+        "parameters" : [ ]
+      } ],
+      "uid" : "7cef57925d5c253098f505183608a59d"
+    } ],
+    "uid" : "8e2bbc68fc46f1f0b2e86c5e96c70046"
+  } ]
+}
